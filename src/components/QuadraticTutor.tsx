@@ -8,7 +8,9 @@ import { useStudentInteractions } from '@/hooks/useStudentInteractions';
 import { TutorController } from '@/lib/tutorController';
 import { ExpertModel } from '@/lib/expertModel';
 import { PedagogicalModel } from '@/lib/pedagogicalModel';
-import beerLogo from '@/assets/beer-logo.png';
+import beerLogo from '@/assets/beer_logo.png';
+import { parseToQuadratic } from '@/lib/parseExpression';
+import { formarEquacao } from '@/lib/regrasAlgebra';
 
 interface QuadraticEquation {
   a: number;
@@ -30,9 +32,7 @@ const QuadraticTutor = () => {
   const [showHints, setShowHints] = useState(false);
   const [currentHint, setCurrentHint] = useState(0);
   const [attempts, setAttempts] = useState(0);
-  const [customA, setCustomA] = useState('2');
-  const [customB, setCustomB] = useState('3');
-  const [customC, setCustomC] = useState('-5');
+  const [customA, setCustomA] = useState('x^2 - 5x + 6');
   const [startTime, setStartTime] = useState(Date.now());
   
   // STI Components
@@ -48,8 +48,6 @@ const QuadraticTutor = () => {
     
     setEquation(newEquation);
     setCustomA(newEquation.a.toString());
-    setCustomB(newEquation.b.toString());
-    setCustomC(newEquation.c.toString());
     resetQuestion();
     
     recordInteraction({
@@ -59,9 +57,8 @@ const QuadraticTutor = () => {
   };
 
   const applyCustomEquation = () => {
-    const a = parseFloat(customA);
-    const b = parseFloat(customB);
-    const c = parseFloat(customC);
+    const eq = formarEquacao(customA);
+    const {a, b, c} = parseToQuadratic(eq);
     
     if (isNaN(a) || isNaN(b) || isNaN(c) || a === 0) {
       toast({
@@ -214,35 +211,13 @@ const QuadraticTutor = () => {
           <CardContent className="p-6">
             <div className="flex items-center gap-4 justify-center flex-wrap">
               <div className="flex items-center gap-2">
-                <label className="font-semibold">a:</label>
                 <Input
                   value={customA}
                   onChange={(e) => setCustomA(e.target.value)}
-                  placeholder="2"
-                  className="w-20"
+                  placeholder="x^2 - 5x + 6"
+                  className="w-30"
                 />
               </div>
-              <span className="text-2xl font-bold">x² +</span>
-              <div className="flex items-center gap-2">
-                <label className="font-semibold">b:</label>
-                <Input
-                  value={customB}
-                  onChange={(e) => setCustomB(e.target.value)}
-                  placeholder="3"
-                  className="w-20"
-                />
-              </div>
-              <span className="text-2xl font-bold">x +</span>
-              <div className="flex items-center gap-2">
-                <label className="font-semibold">c:</label>
-                <Input
-                  value={customC}
-                  onChange={(e) => setCustomC(e.target.value)}
-                  placeholder="-5"
-                  className="w-20"
-                />
-              </div>
-              <span className="text-2xl font-bold">= 0</span>
               <Button onClick={applyCustomEquation} variant="secondary">
                 Aplicar
               </Button>
